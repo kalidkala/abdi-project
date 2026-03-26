@@ -1,7 +1,6 @@
 // Backend API URL (Automatically switches between Local code and Live Cloud URL)
-const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-    ? 'http://localhost:5000/api/teams' 
-    : 'https://ebl-backend-app.onrender.com/api/teams'; // You will replace this with your actual Render URL later
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
+const API_URL = isLocal ? 'http://localhost:5000/api/teams' : 'https://ebl-backend-app.onrender.com/api/teams';
 
 // State & Core Data
 let teams = [];
