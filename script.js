@@ -1,6 +1,6 @@
 // Backend API URL (Automatically switches between Local code and Live Cloud URL)
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
-const API_URL = isLocal ? 'http://localhost:5000/api/teams' : 'https://ebl-backend-app.onrender.com/api/teams';
+const API_URL = isLocal ? 'http://localhost:5000/api/teams' : 'https://abdi-project-1.onrender.com/api/teams';
 
 // State & Core Data
 let teams = [];
@@ -17,6 +17,38 @@ const teamLogoInput = document.getElementById('teamLogo');
 const modalTitle = document.getElementById('modalTitle');
 
 let currentLogoDataUrl = null;
+
+// PWA Install Logic
+let deferredPrompt;
+const installBtn = document.getElementById('installBtn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent Chrome from automatically showing the mini-infobar
+    e.preventDefault();
+    // Stash the event so it can be triggered later.
+    deferredPrompt = e;
+    // Show our custom Install button
+    if (installBtn) installBtn.style.display = 'block';
+});
+
+if (installBtn) {
+    installBtn.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        // Show the native install prompt
+        deferredPrompt.prompt();
+        // Wait for user choice
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            installBtn.style.display = 'none'; // Hide if installed
+        }
+        deferredPrompt = null;
+    });
+}
+
+// Hide install button when app is successfully installed via any method
+window.addEventListener('appinstalled', () => {
+    if (installBtn) installBtn.style.display = 'none';
+});
 
 // i18n Translations
 const translations = {
@@ -81,7 +113,7 @@ async function fetchTeams() {
     try {
         const response = await fetch(API_URL);
         if (!response.ok) throw new Error('Failed to fetch teams');
-        
+
         teams = await response.json(); // The backend natively sorts the response for us!
         renderStandings();
     } catch (error) {
@@ -95,11 +127,11 @@ function setupEventListeners() {
     addTeamBtn.addEventListener('click', openAddModal);
     closeModalBtn.addEventListener('click', closeModal);
     teamForm.addEventListener('submit', handleFormSubmit);
-    
+
     // Image upload trigger
     imagePreview.addEventListener('click', () => teamLogoInput.click());
     teamLogoInput.addEventListener('change', handleImageUpload);
-    
+
     // Language toggles
     document.getElementById('btn-en').addEventListener('click', () => setLanguage('en'));
     document.getElementById('btn-am').addEventListener('click', () => setLanguage('am'));
@@ -108,29 +140,29 @@ function setupEventListeners() {
 // Rendering Logic
 function renderStandings() {
     standingsContainer.innerHTML = '';
-    
+
     if (teams.length === 0) {
         standingsContainer.innerHTML = `<div style="text-align:center; padding: 2rem; color: var(--text-muted)">No teams in database. Click '+' to begin.</div>`;
         return;
     }
-    
+
     // The backend provides calculated fields: played, diff, points out of the box.
     teams.forEach((team, index) => {
         const pos = index + 1;
         const totalTeams = teams.length;
-        
+
         // Relegation Logic: Highlight bottom 2 teams only if there are enough teams to justify relegation
         const isRelegated = totalTeams >= 4 && pos > totalTeams - 2;
-        
+
         const card = document.createElement('div');
         card.className = `team-card pos-${pos} ${isRelegated ? 'relegation' : ''}`;
-        
+
         const logoBg = team.logo ? `url(${team.logo})` : 'linear-gradient(135deg, var(--primary-light), var(--primary))';
         const pdStr = team.diff > 0 ? `+${team.diff}` : team.diff; // The backend names this field `diff`
-        
+
         // Mongo IDs are stored inside _id
         const teamId = team._id ? `'${team._id}'` : `'${team.id}'`;
-        
+
         card.innerHTML = `
             <div class="card-left">
                 <span class="pos-number">${pos}</span>
@@ -158,14 +190,14 @@ function renderStandings() {
 // Form logic handling Backend requests
 async function handleFormSubmit(e) {
     e.preventDefault();
-    
+
     const submitBtn = document.getElementById('submitBtn');
     const originalText = submitBtn.textContent;
     submitBtn.textContent = 'Saving to Database...';
     submitBtn.disabled = true;
 
     const idField = document.getElementById('editTeamId').value;
-    
+
     const teamData = {
         name: document.getElementById('teamName').value,
         wins: parseInt(document.getElementById('teamWins').value),
@@ -173,7 +205,7 @@ async function handleFormSubmit(e) {
         pf: parseInt(document.getElementById('teamPF').value),
         pa: parseInt(document.getElementById('teamPA').value)
     };
-    
+
     // We only attach Logo if it was newly uploaded or keep it blank if untouched to prevent overhead.
     if (currentLogoDataUrl) {
         teamData.logo = currentLogoDataUrl;
@@ -202,9 +234,9 @@ async function handleFormSubmit(e) {
                 body: JSON.stringify(teamData)
             });
         }
-        
+
         if (!response.ok) throw new Error('Failed to save to database');
-        
+
         // Refresh directly from Database to ensure perfect sync
         await fetchTeams();
         closeModal();
@@ -235,16 +267,16 @@ function editTeam(id) {
     // Both 'id' argument and '_id' variable mapped logic for MongoDB compatibility
     const team = teams.find(t => t._id === id || t.id === id);
     if (!team) return;
-    
+
     document.getElementById('editTeamId').value = team._id || team.id;
     document.getElementById('teamName').value = team.name;
     document.getElementById('teamWins').value = team.wins;
     document.getElementById('teamLosses').value = team.losses;
-    
+
     // The backend uses scored and conceded, but front uses PF and PA logic
     document.getElementById('teamPF').value = team.scored || 0;
     document.getElementById('teamPA').value = team.conceded || 0;
-    
+
     if (team.logo) {
         currentLogoDataUrl = team.logo; // This avoids losing standard references
         imagePreview.style.backgroundImage = `url(${team.logo})`;
@@ -254,7 +286,7 @@ function editTeam(id) {
         imagePreview.style.backgroundImage = '';
         imagePreview.innerHTML = '<i class="fa-solid fa-image"></i>';
     }
-    
+
     document.getElementById('modalTitle').textContent = translations[currentLang].modal_edit;
     teamModal.classList.add('active');
 }
@@ -266,7 +298,7 @@ async function deleteTeam(id) {
                 method: 'DELETE'
             });
             if (!response.ok) throw new Error('Failed to delete team');
-            
+
             // Re-fetch clean list after deleting
             await fetchTeams();
         } catch (error) {
@@ -295,11 +327,11 @@ function closeModal() {
 function setLanguage(lang) {
     currentLang = lang;
     localStorage.setItem('ebl_lang', lang);
-    
+
     // Toggle active classes
     document.getElementById('btn-en').classList.toggle('lang-active', lang === 'en');
     document.getElementById('btn-am').classList.toggle('lang-active', lang === 'am');
-    
+
     // Update texts across DOM via data-i18n
     const t = translations[lang];
     document.querySelectorAll('[data-i18n]').forEach(el => {

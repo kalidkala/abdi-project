@@ -24,10 +24,15 @@
                 <h1 data-i18n="league_title">Ethiopian Premier League</h1>
                 <p data-i18n="league_subtitle">Basketball Standings</p>
             </div>
-            <button class="lang-toggle" aria-label="Toggle language">
-                <span class="lang-text lang-active" id="btn-en">EN</span>
-                <span class="lang-text" id="btn-am">AM</span>
-            </button>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <button id="installBtn" class="install-btn" style="display: none;" aria-label="Install App">
+                    <i class="fa-solid fa-download"></i>
+                </button>
+                <button class="lang-toggle" aria-label="Toggle language">
+                    <span class="lang-text lang-active" id="btn-en">EN</span>
+                    <span class="lang-text" id="btn-am">AM</span>
+                </button>
+            </div>
         </header>
 
         <!-- Standings Section -->

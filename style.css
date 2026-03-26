@@ -499,3 +499,75 @@ body::after {
 .submit-btn:hover {
     background: var(--primary);
 }
+
+/* Install Button */
+.install-btn {
+    background: var(--accent);
+    color: #1a1a1a;
+    border: none;
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 12px rgba(255, 183, 3, 0.3);
+}
+
+.install-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 183, 3, 0.5);
+}
+
+/* Deep Mobile Responsiveness */
+@media (max-width: 500px) {
+    .card-left { width: 35%; gap: 8px; }
+    .label-left { width: 35%; gap: 8px; }
+    
+    .card-right { width: 65%; gap: 4px; justify-content: flex-end; }
+    .label-right { width: 65%; gap: 4px; justify-content: flex-end; }
+    
+    .col-stat, .stat {
+        width: 20px;
+        font-size: 0.7rem;
+    }
+    
+    .team-name {
+        font-size: 0.8rem;
+    }
+    
+    .pos-number {
+        font-size: 0.8rem;
+        width: 16px;
+    }
+    
+    .col-pos {
+        width: 16px;
+    }
+    
+    .team-logo-placeholder {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .standings-labels {
+        font-size: 0.65rem;
+        padding: 0 8px 8px 8px;
+    }
+    
+    .team-card {
+        padding: 10px 8px;
+    }
+    
+    /* Make Action Buttons smaller */
+    .col-actions { width: 44px; }
+    .action-btn { padding: 2px; font-size: 0.8rem; }
+    .team-actions { gap: 4px; }
+    
+    .fab {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+        bottom: 24px;
+        right: 16px;
+    }
+}
