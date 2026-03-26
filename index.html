@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Ethiopian Basketball League Standings">
+    <title>Ethiopian Basketball League</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PWA Installation Support -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f1016">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/889/889442.png">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-title">
+                <h1 data-i18n="league_title">Ethiopian Premier League</h1>
+                <p data-i18n="league_subtitle">Basketball Standings</p>
+            </div>
+            <button class="lang-toggle" aria-label="Toggle language">
+                <span class="lang-text lang-active" id="btn-en">EN</span>
+                <span class="lang-text" id="btn-am">AM</span>
+            </button>
+        </header>
+
+        <!-- Standings Section -->
+        <main class="standings-section">
+            <div class="standings-header">
+                <h2 data-i18n="header_standings">Current Standings</h2>
+            </div>
+
+            <!-- Table Headers -->
+            <div class="standings-labels">
+                <div class="label-left">
+                    <span class="col-pos" data-i18n="col_pos">POS</span>
+                    <span class="col-team" data-i18n="col_team">TEAM</span>
+                </div>
+                <div class="label-right">
+                    <span class="col-stat" data-i18n="col_p">P</span>
+                    <span class="col-stat" data-i18n="col_w">W</span>
+                    <span class="col-stat" data-i18n="col_l">L</span>
+                    <span class="col-stat" data-i18n="col_gf" title="Goals For">GF</span>
+                    <span class="col-stat" data-i18n="col_ga" title="Goals Against">GA</span>
+                    <span class="col-stat" data-i18n="col_diff">+/-</span>
+                    <span class="col-stat col-pts" data-i18n="col_pts">PTS</span>
+                    <span class="col-actions"></span> <!-- Space for buttons -->
+                </div>
+            </div>
+
+            <!-- The container where standings cards go dynamically -->
+            <div class="standings-container" id="standingsContainer">
+                <!-- Dynamically populated by JS -->
+            </div>
+        </main>
+
+        <!-- Floating Action Button -->
+        <button class="fab" id="addTeamBtn" aria-label="Add new team">
+            <i class="fa-solid fa-plus"></i>
+        </button>
+
+        <!-- Modal Overlay -->
+        <div class="modal-overlay" id="teamModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalTitle" data-i18n="modal_add">Add New Team</h3>
+                    <button class="close-btn" id="closeModalBtn"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <form id="teamForm">
+                    <input type="hidden" id="editTeamId">
+
+                    <div class="form-group image-upload-group">
+                        <label for="teamLogo" data-i18n="label_logo">Team Logo</label>
+                        <div class="image-preview" id="imagePreview">
+                            <i class="fa-solid fa-image"></i>
+                        </div>
+                        <input type="file" id="teamLogo" accept="image/*">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="teamName" data-i18n="label_team_name">Team Name</label>
+                        <input type="text" id="teamName" required placeholder="Enter team name">
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="form-group">
+                            <label for="teamWins" data-i18n="label_wins">Wins (W)</label>
+                            <input type="number" id="teamWins" required min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="teamLosses" data-i18n="label_losses">Losses (L)</label>
+                            <input type="number" id="teamLosses" required min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="teamPF" data-i18n="label_pf">Goals For (GF)</label>
+                            <input type="number" id="teamPF" required min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="teamPA" data-i18n="label_pa">Goals Against (GA)</label>
+                            <input type="number" id="teamPA" required min="0" value="0">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitBtn" data-i18n="btn_save">Save Team</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register PWA Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(reg => {
+                    console.log('PWA Setup Successfully (Scope: ', reg.scope, ')');
+                }).catch(err => {
+                    console.error('PWA Setup Failed:', err);
+                });
+            });
+        }
+    </script>
+    <script src="script.js"></script>
+</body>
+
+</html>
